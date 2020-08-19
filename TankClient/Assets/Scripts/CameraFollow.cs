@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraFollow : MonoBehaviour {
-	public Transform player;
+	public Transform player ;
 	// Use this for initialization
 	void Start () {
 		

@@ -31,16 +31,39 @@ public class PlayerInfo
 }
 public class WebSocketDemo : MonoBehaviour
 {
-
+    
     WebSocket ws = WebSocketFactory.CreateInstance("ws://localhost:9001");
-    Vector3 pos = new Vector3(0,0,0);
-    Vector3 pos2 = new Vector3(0, 0, 0);
     bool gamestart=false;
-    public Transform player2;
+    public Transform player;
+    PlayerInfo pinfo;
+    int[] playerid = new int[4];
+    int playernum = 0;
+    void addPlayer(PlayerInfo p)
+    {
+        if (p!=null && p.users!=null && p.users.Count < 1) return;
+        //Debug.Log(p.users.Count);
+        PlayerRoot.myself = p.users[0].Id;
+        Debug.Log("myself"+ PlayerRoot.myself);
 
+        for(int i = 1; i < p.users.Count; i++)
+        {
+            GameObject o;
+            if (!PlayerRoot.dic.TryGetValue(p.users[i].Id,out o))
+            {
+                Debug.Log("创建gameobject：" + p.users[i].Id);
+                PlayerRoot.dic[p.users[i].Id] = GameObject.Instantiate<GameObject>(player.gameObject,transform);
+                PlayerRoot.dic[p.users[i].Id].SetActive(true);
+                playerid[playernum] = p.users[i].Id;
+                playernum++;
+            }      
+        }
+
+    }
     // Use this for initialization
     void Start()
     {
+        Debug.Log("start");
+        //GameObject other = GameObject.Instantiate<GameObject>(gameObject);
 
         // Create WebSocket instance
 
@@ -56,21 +79,26 @@ public class WebSocketDemo : MonoBehaviour
         // Add OnMessage event listener
         ws.OnMessage += (byte[] msg) =>
         {
-            Debug.Log("rec length" + msg.Length);
+            // Debug.Log("rec length" + msg.Length);
             byte[] a = new byte[msg.Length - 4];
             for (int i = 4; i < msg.Length; i++)
             {
                 a[i - 4] = msg[i];
             }
-            Debug.Log(a);
+            //Debug.Log(a);
             string s = System.Text.Encoding.ASCII.GetString(a);
             Debug.Log(s);
-            PlayerInfo p = PlayerInfo.CreateFromJSON(s);
+            pinfo = PlayerInfo.CreateFromJSON(s);
             gamestart = true;
-            pos.x = p.users[0].X;
-            pos.z = p.users[0].Y;
-            pos2.x = p.users[1].X;
-            pos2.z = p.users[1].Y;
+            /*
+            pos = new Vector3[p.users.Count];
+            for (int i = 1; i < p.users.Count; i++)
+            {
+                pos[i].x = p.users[i].X;
+                pos[i].y = p.users[i].Id+0.1f;
+                pos[i].z = p.users[i].Y;
+            }
+            pinfo=p;*/
             //ws.Close();
         };
 
@@ -110,26 +138,44 @@ public class WebSocketDemo : MonoBehaviour
         {
             sendMove(90);
         }
+        addPlayer(pinfo);
         Move();
     }
     void Move()
     {
         if (!gamestart) return;
-        pos.x= GetComponent<Transform>().position.y+pos.x;
-        pos.y = GetComponent<Transform>().position.y;
-        pos.z=GetComponent<Transform>().position.y+pos.z;
-
-        pos2.x = GetComponent<Transform>().position.y + pos2.x;
-        pos2.y = GetComponent<Transform>().position.y;
-        pos2.z = GetComponent<Transform>().position.y + pos2.z;
-
-
-        float speed = 5;
-        float step = speed * Time.deltaTime;
-        gameObject.transform.localPosition = new Vector3(Mathf.Lerp(gameObject.transform.localPosition.x, pos.x, step), Mathf.Lerp(gameObject.transform.localPosition.y, pos.y, step), Mathf.Lerp(gameObject.transform.localPosition.z, pos.z, step));
+        //Debug.Log("length" + pos.Length);
+        for (int i = 0; i < playernum; i++)
+        {
+            GameObject g;
+            if (PlayerRoot.dic.TryGetValue(playerid[i], out g))
+            {
+                Vector3 pos=new Vector3(0,0,0);
+                
+                //GameObject g = PlayerRoot.dic[(int)pos[i].y];
+                for(int j = 0; j < pinfo.users.Count; j++)
+                {
+                    if (pinfo.users[j].Id == playerid[i])
+                    {
+                        pos.x = pinfo.users[j].X;
+                        pos.y = g.transform.localPosition.y;
+                        pos.z = pinfo.users[j].Y;
+                        float speed = 5;
+                        float step = speed * Time.deltaTime;
+                        g.transform.localPosition = new Vector3(Mathf.Lerp(g.transform.localPosition.x, pos.x, step), Mathf.Lerp(g.transform.localPosition.y, pos.y, step), Mathf.Lerp(g.transform.localPosition.z, pos.z, step));
+        
+                    }
+                }
+               // Debug.Log("" + pos.x + "," + pos.z);
+                
+            }
+            else
+            {
+                Debug.Log(""+i+":"+pinfo.users[i].Id);
+            }
+        }
         //GetComponent<Transform>().position = pos;
 
-        gameObject.transform.localPosition = new Vector3(Mathf.Lerp(gameObject.transform.localPosition.x, pos2.x, step), Mathf.Lerp(gameObject.transform.localPosition.y, pos2.y, step), Mathf.Lerp(gameObject.transform.localPosition.z, pos2.z, step));
     }
     void sendMove(int angle)
     {
