@@ -40,12 +40,12 @@ public class WebSocketDemo : MonoBehaviour
     int playernum = 0;
     void addPlayer(PlayerInfo p)
     {
-        if (p!=null && p.users!=null && p.users.Count < 1) return;
+        if (p==null || p.users==null || p.users.Count < 1) return;
         //Debug.Log(p.users.Count);
         PlayerRoot.myself = p.users[0].Id;
         Debug.Log("myself"+ PlayerRoot.myself);
 
-        for(int i = 1; i < p.users.Count; i++)
+        for(int i = 0; i < p.users.Count; i++)
         {
             GameObject o;
             if (!PlayerRoot.dic.TryGetValue(p.users[i].Id,out o))
@@ -53,6 +53,10 @@ public class WebSocketDemo : MonoBehaviour
                 Debug.Log("创建gameobject：" + p.users[i].Id);
                 PlayerRoot.dic[p.users[i].Id] = GameObject.Instantiate<GameObject>(player.gameObject,transform);
                 PlayerRoot.dic[p.users[i].Id].SetActive(true);
+                if(PlayerRoot.myself== p.users[i].Id)
+                {
+                    
+                }
                 playerid[playernum] = p.users[i].Id;
                 playernum++;
             }      
