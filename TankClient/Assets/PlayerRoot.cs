@@ -6,6 +6,7 @@ public class PlayerRoot : MonoBehaviour {
 	public GameObject tank;
 	public static int myself;
 	public static Dictionary<int,GameObject> dic = new Dictionary<int, GameObject>();
+	public static GameObject obj_me;
 	// Use this for initialization
 	void Start () {
 

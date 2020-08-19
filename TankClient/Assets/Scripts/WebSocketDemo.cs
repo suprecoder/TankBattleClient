@@ -55,7 +55,8 @@ public class WebSocketDemo : MonoBehaviour
                 PlayerRoot.dic[p.users[i].Id].SetActive(true);
                 if(PlayerRoot.myself== p.users[i].Id)
                 {
-                    
+                    Debug.Log("myobj" + p.users[i].Id);
+                    PlayerRoot.obj_me = PlayerRoot.dic[p.users[i].Id];
                 }
                 playerid[playernum] = p.users[i].Id;
                 playernum++;
@@ -91,7 +92,7 @@ public class WebSocketDemo : MonoBehaviour
             }
             //Debug.Log(a);
             string s = System.Text.Encoding.ASCII.GetString(a);
-            Debug.Log(s);
+           // Debug.Log(s);
             pinfo = PlayerInfo.CreateFromJSON(s);
             gamestart = true;
             /*
