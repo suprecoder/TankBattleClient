@@ -34,7 +34,8 @@ public class WebSocketDemo : MonoBehaviour
 
     WebSocket ws = WebSocketFactory.CreateInstance("ws://localhost:9001");
     Vector3 pos = new Vector3(0,0,0);
-
+    Vector3 pos2 = new Vector3(0, 0, 0);
+    public Transform player2;
 
     // Use this for initialization
     void Start()
@@ -64,6 +65,8 @@ public class WebSocketDemo : MonoBehaviour
             PlayerInfo p = PlayerInfo.CreateFromJSON(s);
             pos.x = p.users[0].X;
             pos.z = p.users[0].Y;
+            pos2.x = p.users[1].X;
+            pos2.z = p.users[1].Y;
             //ws.Close();
         };
 
@@ -111,10 +114,16 @@ public class WebSocketDemo : MonoBehaviour
         pos.y = GetComponent<Transform>().position.y;
         pos.z=GetComponent<Transform>().position.y+pos.z;
 
+        pos2.x = GetComponent<Transform>().position.y + pos2.x;
+        pos2.y = GetComponent<Transform>().position.y;
+        pos2.z = GetComponent<Transform>().position.y + pos2.z;
+
         float speed = 5;
         float step = speed * Time.deltaTime;
         gameObject.transform.localPosition = new Vector3(Mathf.Lerp(gameObject.transform.localPosition.x, pos.x, step), Mathf.Lerp(gameObject.transform.localPosition.y, pos.y, step), Mathf.Lerp(gameObject.transform.localPosition.z, pos.z, step));
         //GetComponent<Transform>().position = pos;
+
+        gameObject.transform.localPosition = new Vector3(Mathf.Lerp(gameObject.transform.localPosition.x, pos2.x, step), Mathf.Lerp(gameObject.transform.localPosition.y, pos2.y, step), Mathf.Lerp(gameObject.transform.localPosition.z, pos2.z, step));
     }
     void sendMove(int angle)
     {
