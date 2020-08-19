@@ -35,6 +35,7 @@ public class WebSocketDemo : MonoBehaviour
     WebSocket ws = WebSocketFactory.CreateInstance("ws://localhost:9001");
     Vector3 pos = new Vector3(0,0,0);
     Vector3 pos2 = new Vector3(0, 0, 0);
+    bool gamestart=false;
     public Transform player2;
 
     // Use this for initialization
@@ -61,8 +62,11 @@ public class WebSocketDemo : MonoBehaviour
             {
                 a[i - 4] = msg[i];
             }
+            Debug.Log(a);
             string s = System.Text.Encoding.ASCII.GetString(a);
+            Debug.Log(s);
             PlayerInfo p = PlayerInfo.CreateFromJSON(s);
+            gamestart = true;
             pos.x = p.users[0].X;
             pos.z = p.users[0].Y;
             pos2.x = p.users[1].X;
@@ -110,6 +114,7 @@ public class WebSocketDemo : MonoBehaviour
     }
     void Move()
     {
+        if (!gamestart) return;
         pos.x= GetComponent<Transform>().position.y+pos.x;
         pos.y = GetComponent<Transform>().position.y;
         pos.z=GetComponent<Transform>().position.y+pos.z;
@@ -117,6 +122,7 @@ public class WebSocketDemo : MonoBehaviour
         pos2.x = GetComponent<Transform>().position.y + pos2.x;
         pos2.y = GetComponent<Transform>().position.y;
         pos2.z = GetComponent<Transform>().position.y + pos2.z;
+
 
         float speed = 5;
         float step = speed * Time.deltaTime;
