@@ -1,2 +1,4 @@
 *.lock
 TankClient/Temp/
+TankClient/ProjectSettings/*.dll
+TankClient/obj/
